@@ -84,10 +84,11 @@ namespace Business.Implementations
             {
                 ApiResponse<List<BankDto.Response>> rb = new ApiResponse<List<BankDto.Response>>();
 
-     
-                
 
-                var gr = _repo.GetAllAsync(k => k.IsDeleted == false);
+
+
+                //var gr = _repo.GetAllAsync(k => k.IsDeleted == false);
+                var gr = await _repo.GetBanks();
                 var returnList = _mapper.Map<List<BankDto.Response>>(gr);
 
 

@@ -10,5 +10,7 @@ namespace DataAccess.Interfaces
 {
     public interface IBankRepository : IBaseRepository<Banks,int>
     {
+
+        Task<List<Banks>>GetBanks();
     }
 }
