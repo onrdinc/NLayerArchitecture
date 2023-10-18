@@ -10,9 +10,9 @@ namespace DataAccess.Contexts
 {
     public class DataContext : DbContext
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public DataContext(DbContextOptions<DataContext> context) : base(context)
         {
-            optionsBuilder.UseSqlServer("server=.\\SQLEXPRESS;database=Test;trusted_connection=true; trustServerCertificate=true;");
+            
         }
 
         public DbSet<Banks> Banks { get; set; }
