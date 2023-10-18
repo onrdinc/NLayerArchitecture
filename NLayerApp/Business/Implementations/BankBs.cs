@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Business.Interfaces;
 using DataAccess.Interfaces;
+using Infrastructure.Aspects.Caching;
+using Infrastructure.CrossCuttingConcerns.Caching;
 using Infrastructure.UnitOfWorks.Interface;
 using Infrastructure.Utilites.ApiResponses;
 using Models.Dtos;
@@ -18,12 +20,13 @@ namespace Business.Implementations
         private readonly IBankRepository _repo;
         private readonly IMapper _mapper;
         private IUnitOfWork _unitOfWork;
-        public BankBs(IBankRepository repo,IMapper mapper,IUnitOfWork unitOfWork)
+        public BankBs(IBankRepository repo, IMapper mapper, IUnitOfWork unitOfWork)
         {
-            _repo = repo;   
+            _repo = repo;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
+
 
         public async Task<ApiResponse<BankDto.Response>> Add(BankDto.Form form, int currentUserId)
         {
@@ -71,9 +74,36 @@ namespace Business.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<ApiResponse<List<BankDto.Response>>> MultipleGet(BankDto.FilterForm form, int currentUserId, params string[] includeList)
+        
+        //[CacheRemoveAspect("IBankBs.MultipleGet")]
+        [CacheAspect]
+        public async Task<ApiResponse<List<BankDto.Response>>> MultipleGet(BankDto.FilterForm form, int currentUserId, params string[] includeList)
         {
-            throw new NotImplementedException();
+            try
+            {
+                ApiResponse<List<BankDto.Response>> rb = new ApiResponse<List<BankDto.Response>>();
+
+     
+                
+
+                var gr = _repo.GetAllAsync(k => k.IsDeleted == false);
+                var returnList = _mapper.Map<List<BankDto.Response>>(gr);
+
+
+
+                rb.Count = returnList.Count;
+                rb.Item = returnList;
+                return await Task.FromResult(rb);
+
+                //var response = ApiResponse<List<MRoleGroupTypeDto.Response>>.Success(StatusCodes.Status200OK, returnList);
+
+                //return response;
+            }
+            catch (Exception ex)
+            {
+
+                throw await Task.FromResult(ex);
+            }
         }
 
         public Task<ApiResponse<BankDto.Response>> SingleGet(int id, int currentUserId, params string[] includeList)
