@@ -27,7 +27,7 @@ namespace Business.Implementations
             _unitOfWork = unitOfWork;
         }
 
-
+        [CacheRemoveAspect("IBankBs.MultipleGet")]
         public async Task<ApiResponse<BankDto.Response>> Add(BankDto.Form form, int currentUserId)
         {
             try
@@ -64,6 +64,7 @@ namespace Business.Implementations
             }
         }
 
+        [CacheRemoveAspect("IBankBs.MultipleGet")]
         public Task<ApiResponse<NoData>> Delete(int id, int currentUserId)
         {
             throw new NotImplementedException();
@@ -75,7 +76,7 @@ namespace Business.Implementations
         }
 
         
-        //[CacheRemoveAspect("IBankBs.MultipleGet")]
+
         [CacheAspect]
         public async Task<ApiResponse<List<BankDto.Response>>> MultipleGet(BankDto.FilterForm form, int currentUserId, params string[] includeList)
         {
@@ -111,6 +112,7 @@ namespace Business.Implementations
             throw new NotImplementedException();
         }
 
+        [CacheRemoveAspect("IBankBs.MultipleGet")]
         public Task<ApiResponse<NoData>> Update(BankDto.Form form, int currentUserId)
         {
             throw new NotImplementedException();
