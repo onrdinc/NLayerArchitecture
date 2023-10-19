@@ -1,0 +1,711 @@
+﻿var app = angular.module('app', []);
+
+
+
+
+app.directive('format', ['$filter', function ($filter) {
+    return {
+        require: '?ngModel',
+        link: function (scope, elem, attrs, ctrl) {
+            if (!ctrl) return;
+
+            ctrl.$formatters.unshift(function (a) {
+                return $filter(attrs.format)(ctrl.$modelValue, '')
+            });
+
+            elem.bind('blur', function (event) {
+                var plainNumber = elem.val().replace(/[^\d|\-+|\.+]/g, '');
+                elem.val($filter(attrs.format)(plainNumber, ''));
+            });
+        }
+
+    };
+}]);
+
+app.filter('groupBy', function () {
+    return function (input, key) {
+        if (!key) return input;
+
+        var output = {};
+        for (var i = 0; i < input.length; i++) {
+            if (!output[input[i][key]]) {
+                output[input[i][key]] = [];
+            }
+            output[input[i][key]].push(input[i]);
+        }
+        return output;
+    };
+});
+
+//app.config(function ($routeProvider) {
+//    $routeProvider
+
+
+//        .when("/", {
+//            templateUrl: "/templates/signIn.html",
+//            title: 'Oturum Aç'
+//        })
+//        .when("/signUp", {
+//            templateUrl: "/templates/signUp.html",
+//            title: 'Kaydol'
+//        })
+//        .when("/home", {
+//            templateUrl: "/templates/home.html",
+//            title: 'Ana Sayfa'
+//        })
+//        .when("/:organizationUrl/:url", {
+//            templateUrl: "/templates/companyDetail.html",
+//            title: 'Şirket Detayı'
+//        })
+      
+//        .otherwise({
+//            redirectTo: "/",
+//            title: 'Purchasing'
+//        });
+//});
+
+//app.run(['$location', '$rootScope', '$routeParams', function ($location, $rootScope, $routeParams) {
+
+
+
+//    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
+
+//        if ($routeParams.url != undefined) {
+//            $rootScope.title = $routeParams.url;
+//        }
+//        else {
+//            $rootScope.title = current.$$route.title;
+//        }
+
+//    });
+//}]);
+
+app.controller('controller', function ($scope, $http, $location) {
+
+    //$scope.apiLocation = 'https://localhost:7060/api';
+
+
+
+    $scope.companyRoles = {
+        accountType: '',
+        roles: ''
+    };
+
+    $scope.alert = {
+        item: {},
+        action: function (response) {
+            this.item = response;
+            $('#alertModal').modal('show');
+        }
+    };
+
+    $scope.groupBy = function (array, key) {
+        return array.reduce(function (result, item) {
+            var groupKey = item[key];
+            if (!result[groupKey]) {
+                result[groupKey] = [];
+            }
+            result[groupKey].push(item);
+            return result;
+        }, {});
+    };
+
+    $scope.clear = function (fd) {
+        var formData = new FormData();
+
+        for (var pair of fd.entries()) {
+
+            if (typeof pair[1] != 'object') {
+                pair[1] = pair[1].replace(null, '');
+                pair[1] = pair[1].replace('undefined', '');
+            }
+
+
+            formData.append(pair[0], pair[1]);
+        }
+        return formData;
+    };
+
+    $scope.dateFormat = function (date) {
+
+        return $filter('date')(date, 'yyyy-MM-dd');
+    };
+
+
+   
+    $scope.getDateDiffText = function (d) {
+        var currentDate = new Date();
+        var maxUpdateDate = new Date(d);
+
+        var seconds = Math.floor((currentDate - maxUpdateDate) / 1000);
+        var years = seconds / 31536000;
+        var months = seconds / 2592000;
+        var days = seconds / 86400;
+        var hours = seconds / 3600;
+        var minutes = seconds / 60;
+        // console.log('getDateDiffText', seconds, years, months, days, hours, minutes);
+        if (seconds < 0) {
+            if (years < -1) {
+                return Math.floor(years) + " yıl sonra";
+            }
+            if (months < -1) {
+                return Math.floor(months) + " ay sonra";
+            }
+            if (days < -1) {
+                return Math.floor(days) + " gün sonra";
+            }
+            if (hours < -1) {
+                return Math.floor(hours) + " saat sonra";
+            }
+            if (minutes < -1) {
+                return Math.floor(minutes) + " dakika sonra";
+            }
+            return Math.floor(seconds) + " saniye sonra";
+        } else {
+            if (years > 1) {
+                return Math.floor(years) + " yıl önce";
+            }
+            if (months > 1) {
+                return Math.floor(months) + " ay önce";
+            }
+            if (days > 1) {
+                return Math.floor(days) + " gün önce";
+            }
+            if (hours > 1) {
+                return Math.floor(hours) + " saat önce";
+            }
+            if (minutes > 1) {
+                return Math.floor(minutes) + " dakika önce";
+            }
+            return Math.floor(seconds) + " saniye önce";
+        }
+    };
+
+    $scope.fnUser = function () {
+
+        var obj = {
+            filter: {
+                search: '',
+                userId: '',
+
+            },
+            isLoading: false,
+            method: '',
+            detail: [],
+            list: [],
+            userlist: [],
+            employee: [],
+            employeeList: [],
+            current: null,
+
+            token: function () {
+                if (!obj.isLoading) {
+                    obj.isLoading = true;
+                }
+                var fd = new FormData();
+                fd.append('Email', obj.detail[0].email);
+                fd.append('Password', obj.detail[0].password);
+
+                $http({
+                    method: 'POST',
+                    url: "/Authentication/LogIn",
+                    data: $scope.clear(fd),
+                    dataType:"json",
+                    headers: {
+                        'Content-Type': undefined,
+
+                    }
+                }).then(function successCallback(response) {
+                    if (response.status == 200) {
+                        $scope.fnData.set('token', response.data.item.token);
+                        //obj.myProfile();
+                        //$location.path('/dashboard')
+
+                        //location.href = '/#!/home';
+                    } else {
+                        $scope.alert.action(response);
+                    }
+                    obj.isLoading = false;
+                }, function errorCallback(response) {
+                    $scope.alert.action(response);
+                    obj.isLoading = false;
+                });
+
+            },
+            currentUserGet: function () {
+                obj.isLoading = true;
+                var token = $scope.fnData.get('token');
+                $http({
+                    method: 'GET',
+                    url: $scope.apiLocation + '/user/myprofile',
+                    headers: {
+                        'Content-Type': undefined,
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(function successCallback(response) {
+                    if (response.status == 200) {
+                        obj.current = (response.data.item);
+
+                    } else {
+                        $scope.alert.action(response);
+                    }
+                    obj.isLoading = false;
+                }, function errorCallback(response) {
+                    //$scope.alert.action(response);
+                    obj.isLoading = false;
+                });
+
+            },
+
+            singleGet: function (id) {
+                obj.isLoading = true;
+                var token = $scope.fnData.get('token');
+                $http({
+                    method: 'GET',
+                    url: $scope.apiLocation + '/user/' + id,
+                    headers: {
+                        'Content-Type': undefined,
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(function successCallback(response) {
+
+                    if (response.status == 200) {
+                        obj.method = 'PUT';
+                        obj.detail = [];
+                        obj.detail.push(response.data.item);
+                        console.log(response.data.item);
+                        $('#userProfileEditFormModal').modal('show');
+
+                    } else {
+                        $scope.alert.action(response);
+                    }
+                    obj.isLoading = false;
+                }, function errorCallback(response) {
+                    $scope.alert.action(response);
+                    obj.isLoading = false;
+                });
+            },
+
+            myProfile: function () {
+                obj.isLoading = true;
+                var token = $scope.fnData.get('token');
+                $http({
+                    method: 'GET',
+                    url: $scope.apiLocation + '/user/myprofile',
+                    headers: {
+                        'Content-Type': undefined,
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(function successCallback(response) {
+
+                    if (response.status == 200) {
+                        obj.method = 'PUT';
+                        obj.detail = [];
+                        obj.detail.push(response.data.item);
+                        $scope.companyRoles.accountType = response.data.item.accountType;
+                    } else {
+                        $scope.alert.action(response);
+                    }
+                    obj.isLoading = false;
+                }, function errorCallback(response) {
+                    //$scope.alert.action(response);
+                    obj.isLoading = false;
+                });
+
+            },
+            add: function () {
+
+                obj.method = 'POST';
+                obj.detail = [];
+                obj.detail.push({ password: '', email: '', firstName: '', userName: '', lastName: ''});
+
+
+            },
+            save: function () {
+                if (!obj.isLoading) {
+                    obj.isLoading = true;
+                }
+                var token = $scope.fnData.get('token');
+
+                var fd = new FormData();
+                fd.append('FirstName', obj.detail[0].firstName);
+                fd.append('LastName', obj.detail[0].lastName);
+                fd.append('UserName', $scope.urlFormat.urlText(obj.detail[0].userName));
+                fd.append('Email', obj.detail[0].email);
+                fd.append('Password', obj.detail[0].password);
+                fd.append('OrganizationUrl', $scope.urlFormat.urlText(obj.detail[0].organizationName));
+                fd.append('OrganizationName', obj.detail[0].organizationName);
+                fd.append('CategoryId', obj.detail[0].categoryId);
+                fd.append('AccountType', obj.detail[0].accountType);
+                $http({
+                    method: obj.method,
+                    url: $scope.apiLocation + '/user',
+                    data: $scope.clear(fd),
+                    headers: {
+                        'Content-Type': undefined,
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(function successCallback(response) {
+
+                    if (response.status == 200) {
+                        //$scope.fnData.set('token', response.data.item.token);
+                        location.href = '/';
+                    } else {
+                        $scope.alert.action(response);
+
+                    }
+
+                    $scope.alert.action(response);
+                    obj.isLoading = false;
+
+                }, function errorCallback(response) {
+                    $scope.alert.action(response);
+                    obj.isLoading = false;
+                });
+
+            },
+            employeeAdd: function () {
+
+                obj.method = 'POST';
+                obj.employee = [];
+                obj.employee.push({});
+                $('#employeeAddFormModal').modal('show');
+
+
+            },
+            employeeSave: function () {
+                if (!obj.isLoading) {
+                    obj.isLoading = true;
+                }
+                var token = $scope.fnData.get('token');
+
+                var fd = new FormData();
+                fd.append('FirstName', obj.employee[0].firstName);
+                fd.append('LastName', obj.employee[0].lastName);
+                fd.append('UserName', $scope.urlFormat.urlText(obj.employee[0].userName));
+                fd.append('Email', obj.employee[0].email);
+                fd.append('Password', obj.employee[0].password);
+                $http({
+                    method: obj.method,
+                    url: $scope.apiLocation + '/user/employeeAdd',
+                    data: $scope.clear(fd),
+                    headers: {
+                        'Content-Type': undefined,
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(function successCallback(response) {
+
+                    if (response.status == 200) {
+                        $('#employeeAddFormModal').modal('hide');
+                        $scope.alert.action(response);
+                        obj.myEmployees();
+                    } else {
+                        $scope.alert.action(response);
+
+                    }
+
+                    $scope.alert.action(response);
+                    obj.isLoading = false;
+
+                }, function errorCallback(response) {
+                    $scope.alert.action(response);
+                    obj.isLoading = false;
+                });
+
+            },
+            employeeUpdate: function () {
+                if (!obj.isLoading) {
+                    obj.isLoading = true;
+                }
+                var token = $scope.fnData.get('token');
+
+                var fd = new FormData();
+                fd.append('Id', obj.employee[0].id);
+
+                fd.append('FirstName', obj.employee[0].firstName);
+                fd.append('LastName', obj.employee[0].lastName);
+                fd.append('UserName', $scope.urlFormat.urlText(obj.employee[0].userName));
+                fd.append('Email', obj.employee[0].email);
+                $http({
+                    method: 'PUT',
+                    url: $scope.apiLocation + '/user',
+                    data: $scope.clear(fd),
+                    headers: {
+                        'Content-Type': undefined,
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(function successCallback(response) {
+
+                    if (response.status == 200) {
+                        $('#employeeAddFormModal').modal('hide');
+                        $scope.alert.action(response);
+                        obj.myEmployees();
+                    } else {
+                        $scope.alert.action(response);
+
+                    }
+
+                    $scope.alert.action(response);
+                    obj.isLoading = false;
+
+                }, function errorCallback(response) {
+                    $scope.alert.action(response);
+                    obj.isLoading = false;
+                });
+
+            },
+
+            profileEditSave: function () {
+
+                var file = $scope.myFile;
+                obj.isLoading = true;
+                var token = $scope.fnData.get('token');
+                var fd = new FormData();
+
+                fd.append('Id', obj.detail[0].id);
+                fd.append('FirstName', obj.detail[0].firstName);
+                fd.append('UserName', obj.detail[0].userName);
+                fd.append('LastName', obj.detail[0].lastName);
+                fd.append('Email', obj.detail[0].email);
+                //fd.append('Password', obj.detail[0].password);
+                fd.append('OrganizationName', obj.detail[0].organizationName);
+                fd.append('OrganizationUrl', $scope.urlFormat.urlText(obj.detail[0].organizationName));
+
+
+                //var myFile = document.getElementById('profilePhotoInput');
+                //if (myFile != null) {
+                //    fd.append('ProfilePhoto', myFile.files[0]);
+                //}
+                //var myFile = document.getElementById('profileBannerPhotoUpload');
+                //if (myFile != null) {
+                //    fd.append('ProfileBannerPhoto', myFile.files[0]);
+                //}
+
+                $http({
+                    method: 'PUT',
+                    url: $scope.apiLocation + '/user/userProfileEdit',
+                    data: $scope.clear(fd),
+                    headers: {
+                        'Content-Type': undefined,
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(function successCallback(response) {
+
+                    if (response.status == 200) {
+                        //$scope.fnData.set('token', response.data.item.token);
+                        //location.href = '/Dashboard';
+                        //location.href = '/Dashboard';
+                        $scope.alert.action(response);
+                        $('#userProfileEditFormModal').modal('hide');
+
+                    } else {
+                        $scope.alert.action(response);
+
+                    }
+                    $scope.alert.action(response);
+                    obj.isLoading = false;
+
+                }, function errorCallback(response) {
+                    $scope.alert.action(response);
+                    obj.isLoading = false;
+                });
+
+            },
+            multipleGet: function () {
+
+                obj.isLoading = true;
+
+                var token = $scope.fnData.get('token');
+                var fd = new FormData();
+
+
+
+                $http({
+                    method: 'POST',
+                    url: $scope.apiLocation + '/user/multipleget',
+                    data: $scope.clear(fd),
+                    headers: {
+                        'Content-Type': undefined,
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(function successCallback(response) {
+                    if (response.status == 200) {
+                        obj.list = response.data.item;
+                    } else {
+                        $scope.alert.action(response);
+                    }
+                    obj.isLoading = false;
+                }, function errorCallback(response) {
+                    $scope.alert.action(response);
+                    obj.isLoading = false;
+                });
+            },
+
+            myEmployees: function () {
+
+                obj.isLoading = true;
+
+                var token = $scope.fnData.get('token');
+                var fd = new FormData();
+
+                $http({
+                    method: 'POST',
+                    url: $scope.apiLocation + '/user/myemployees',
+                    data: $scope.clear(fd),
+                    headers: {
+                        'Content-Type': undefined,
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(function successCallback(response) {
+                    if (response.status == 200) {
+                        obj.employeeList = [];
+                        angular.forEach(response.data.item, function (value, key) {
+                            obj.employeeList.push(value);
+                        });
+                        obj.count = response.data.count;
+                    }
+                    else {
+                        $scope.alert.action(response);
+                    }
+                    obj.isLoading = false;
+                }, function errorCallback(response) {
+                    $scope.alert.action(response);
+                    obj.isLoading = false;
+                });
+            },
+
+            delete: function (id) {
+                var token = $scope.fnData.get('token');
+
+                if (confirm('Silmek istediğine emin misin?')) {
+                    $http({
+                        method: 'DELETE',
+                        url: $scope.apiLocation + '/user/' + id,
+
+                        headers: {
+                            'Content-Type': undefined,
+                            'Authorization': 'Bearer ' + token
+                        }
+                    }).then(function successCallback(response) {
+
+                        if (response.status == 200) {
+                            $scope.alert.action(response);
+                            obj.myEmployees();
+                        } else {
+
+                        }
+                        $scope.alert.action(response);
+                        obj.isLoading = false;
+
+                    }, function errorCallback(response) {
+                        $scope.alert.action(response);
+                        obj.isLoading = false;
+
+                    });
+
+                }
+            },
+           
+            logOut: function () {
+                obj.isLoading = true;
+                $scope.fnData.set('token', '');
+                location.href = '/';
+            },
+
+        };
+        return obj;
+    };
+    $scope.user = $scope.fnUser();
+
+
+
+
+    $scope.fnUrlFormat = function () {
+        var obj = {
+            urlText: function (data) {
+                var strReturn = data;
+                for (var i = 0; i < 3; i++) {
+                    strReturn = data;
+
+                    strReturn = String(strReturn).toLowerCase();
+
+                    strReturn = String(strReturn).replace(/\?/g, "");
+                    strReturn = String(strReturn).replace(/\&/g, "");
+                    strReturn = String(strReturn).replace(/\!/g, "");
+                    strReturn = String(strReturn).replace(/\%/g, "");
+                    strReturn = String(strReturn).replace(/\=/g, "");
+                    strReturn = String(strReturn).replace(/\:/g, "");
+                    strReturn = String(strReturn).replace(/\;/g, "");
+                    strReturn = String(strReturn).replace(/\;/g, "");
+                    strReturn = String(strReturn).replace(/\;/g, "");
+                    strReturn = String(strReturn).replace(/\"/g, "");
+                    strReturn = String(strReturn).replace(/\$/g, "");
+                    strReturn = String(strReturn).replace(/\'/g, "");
+                    strReturn = String(strReturn).replace(/\(/g, "");
+                    strReturn = String(strReturn).replace(/\)/g, "");
+                    strReturn = String(strReturn).replace(/\*/g, "");
+                    strReturn = String(strReturn).replace(/\+/g, "");
+                    strReturn = String(strReturn).replace(/\./g, "");
+                    strReturn = String(strReturn).replace(/\//g, "");
+                    strReturn = String(strReturn).replace(/\</g, "");
+                    strReturn = String(strReturn).replace(/\>/g, "");
+                    strReturn = String(strReturn).replace(/\@/g, "");
+                    strReturn = String(strReturn).replace(/\[/g, "");
+                    strReturn = String(strReturn).replace(/\]/g, "");
+                    strReturn = String(strReturn).replace(/\_/g, "");
+                    strReturn = String(strReturn).replace(/\~/g, "");
+                    strReturn = String(strReturn).replace(/\^/g, "");
+                    strReturn = String(strReturn).replace(/\{/g, "");
+                    strReturn = String(strReturn).replace(/\}/g, "");
+                    strReturn = String(strReturn).replace(/\|/g, "");
+                    strReturn = String(strReturn).replace(/\,/g, "");
+                    strReturn = String(strReturn).replace(/\"/g, "");
+
+                    strReturn = String(strReturn).replace(/ğ/g, "g");
+                    strReturn = String(strReturn).replace(/Ğ/g, "G");
+                    strReturn = String(strReturn).replace(/ü/g, "u");
+                    strReturn = String(strReturn).replace(/Ü/g, "U");
+                    strReturn = String(strReturn).replace(/ş/g, "s");
+                    strReturn = String(strReturn).replace(/Ş/g, "S");
+                    strReturn = String(strReturn).replace(/ı/g, "i");
+                    strReturn = String(strReturn).replace(/i̇/g, "i");
+                    strReturn = String(strReturn).replace(/İ/g, "i");
+                    strReturn = String(strReturn).replace(/ö/g, "o");
+                    strReturn = String(strReturn).replace(/Ö/g, "O");
+                    strReturn = String(strReturn).replace(/ç/g, "c");
+                    strReturn = String(strReturn).replace(/Ç/g, "C");
+                    strReturn = String(strReturn).replace(/ /g, "-");
+                    strReturn = String(strReturn).replace(/------/g, "-");
+                    strReturn = String(strReturn).replace(/-----/g, "-");
+                    strReturn = String(strReturn).replace(/----/g, "-");
+                    strReturn = String(strReturn).replace(/---/g, "-");
+                    strReturn = String(strReturn).replace(/--/g, "-");
+                    strReturn = String(strReturn).replace(/\+\+\+\++/g, "-");
+                    strReturn = String(strReturn).replace(/\+\+\++/g, "-");
+                    strReturn = String(strReturn).replace(/\++\++/g, "-");
+                    strReturn = String(strReturn).replace(/\++\+/g, "-");
+                    strReturn = String(strReturn).replace(/\++/g, "-");
+                    strReturn = String(strReturn).replace(/\+/g, "-");
+                }
+                return strReturn;
+            }
+        }
+        return obj;
+    }
+    $scope.urlFormat = $scope.fnUrlFormat();
+
+    $scope.fnData = {
+        set: function (key, val) {
+            localStorage.setItem('purchasing-' + key, val);
+        },
+        get: function (key) {
+            var val = localStorage.getItem('purchasing-' + key);
+            return val
+        }
+    };
+
+    $scope.user.currentUserGet();
+
+
+});
+
