@@ -17,6 +17,7 @@ namespace DataAccess.Contexts
 
         public DbSet<Banks> Banks { get; set; }
         public DbSet<MyCards> MyCards { get; set; }
+        public DbSet<Users> Users { get; set; }
 
     }
 }

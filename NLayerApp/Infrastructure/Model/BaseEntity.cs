@@ -8,11 +8,11 @@ namespace Infrastructure.Model
         [Key]
         public TId Id { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public int? CreatedBy { get; set; }
+        public long? CreatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        public int? UpdatedBy { get; set; }
+        public long? UpdatedBy { get; set; }
         public DateTime? DeletedDate { get; set; }
-        public int? DeletedBy { get; set; }
+        public long? DeletedBy { get; set; }
         public bool IsDeleted { get; set; } = false;
     }
 }
