@@ -26,11 +26,11 @@ namespace API.Controllers
 
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("MultipleGet")]
-        public async Task<IActionResult> MultipleGet([FromForm] BankDto.FilterForm form)
+        public async Task<IActionResult> MultipleGet()
         {
-            var response = await _bankBs.MultipleGet(form, 0);
+            var response = await _bankBs.MultipleGet(null, 0);
             return await Task.FromResult(StatusCode(response.StatusCode, response));
 
         }

@@ -45,7 +45,7 @@ namespace Web.HttpApiServices
             };
 
             if (!string.IsNullOrEmpty(token))
-                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                requestMessage.Headers.Authorization = new AuthenticationHeaderValue(token);
 
             var responseMessage = await client.SendAsync(requestMessage);
             var jsonResponse = await responseMessage.Content.ReadAsStringAsync();

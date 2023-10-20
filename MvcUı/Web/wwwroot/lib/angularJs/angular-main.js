@@ -197,6 +197,14 @@ app.controller('controller', function ($scope, $http, $location) {
             employee: [],
             employeeList: [],
             current: null,
+            add: function () {
+
+                obj.method = 'POST';
+                obj.detail = [];
+                obj.detail.push({ password: '', email: '', firstName: '', userName: '', lastName: ''});
+
+
+            },
             token: function () {
                 if (!obj.isLoading) {
                     obj.isLoading = true;
@@ -216,7 +224,7 @@ app.controller('controller', function ($scope, $http, $location) {
                 }).then(function successCallback(response) {
                     if (response.status == 200) {
                         $scope.fnData.set('token', response.data.item.token);
-                        obj.myProfile();
+                        location.href = '/Bank/Index'
                         //$location.path('/dashboard')
 
                         //location.href = '/#!/home';
@@ -299,279 +307,72 @@ app.controller('controller', function ($scope, $http, $location) {
             //    });
 
             //},
-            currentUserGet: function () {
+
+
+
+
+
+
+
+           
+            logOut: function () {
                 obj.isLoading = true;
-                var token = $scope.fnData.get('token');
-                $http({
-                    method: 'GET',
-                    url: $scope.apiLocation + '/user/myprofile',
-                    headers: {
-                        'Content-Type': undefined,
-                        'Authorization': 'Bearer ' + token
-                    }
-                }).then(function successCallback(response) {
-                    if (response.status == 200) {
-                        obj.current = (response.data.item);
-
-                    } else {
-                        $scope.alert.action(response);
-                    }
-                    obj.isLoading = false;
-                }, function errorCallback(response) {
-                    //$scope.alert.action(response);
-                    obj.isLoading = false;
-                });
-
+                $scope.fnData.set('token', '');
+                location.href = '/';
             },
 
-            singleGet: function (id) {
-                obj.isLoading = true;
-                var token = $scope.fnData.get('token');
-                $http({
-                    method: 'GET',
-                    url: $scope.apiLocation + '/user/' + id,
-                    headers: {
-                        'Content-Type': undefined,
-                        'Authorization': 'Bearer ' + token
-                    }
-                }).then(function successCallback(response) {
+        };
+        return obj;
+    };
+    $scope.user = $scope.fnUser();
 
-                    if (response.status == 200) {
-                        obj.method = 'PUT';
-                        obj.detail = [];
-                        obj.detail.push(response.data.item);
-                        console.log(response.data.item);
-                        $('#userProfileEditFormModal').modal('show');
 
-                    } else {
-                        $scope.alert.action(response);
-                    }
-                    obj.isLoading = false;
-                }, function errorCallback(response) {
-                    $scope.alert.action(response);
-                    obj.isLoading = false;
-                });
+    $scope.fnBank = function () {
+        var obj = {
+            filter: {
+                search: '',
             },
-
-            myProfile: function () {
-                obj.isLoading = true;
-                var token = $scope.fnData.get('token');
-                $http({
-                    method: 'GET',
-                    url: $scope.apiLocation + '/user/myprofile',
-                    headers: {
-                        'Content-Type': undefined,
-                        'Authorization': 'Bearer ' + token
-                    }
-                }).then(function successCallback(response) {
-
-                    if (response.status == 200) {
-                        obj.method = 'PUT';
-                        obj.detail = [];
-                        obj.detail.push(response.data.item);
-                        $scope.companyRoles.accountType = response.data.item.accountType;
-                    } else {
-                        $scope.alert.action(response);
-                    }
-                    obj.isLoading = false;
-                }, function errorCallback(response) {
-                    //$scope.alert.action(response);
-                    obj.isLoading = false;
-                });
-
-            },
+            isLoading: false,
+            method: '',
+            datail: [],
+            list: [],
+            count: 0,
             add: function () {
-
                 obj.method = 'POST';
-                obj.detail = [];
-                obj.detail.push({ password: '', email: '', firstName: '', userName: '', lastName: ''});
-
-
+                obj.detail = [{}];
+                $('#departmentAddFormModal').modal('show');
             },
             save: function () {
                 if (!obj.isLoading) {
                     obj.isLoading = true;
                 }
                 var token = $scope.fnData.get('token');
-
-                var fd = new FormData();
-                fd.append('FirstName', obj.detail[0].firstName);
-                fd.append('LastName', obj.detail[0].lastName);
-                fd.append('UserName', $scope.urlFormat.urlText(obj.detail[0].userName));
-                fd.append('Email', obj.detail[0].email);
-                fd.append('Password', obj.detail[0].password);
-                fd.append('OrganizationUrl', $scope.urlFormat.urlText(obj.detail[0].organizationName));
-                fd.append('OrganizationName', obj.detail[0].organizationName);
-                fd.append('CategoryId', obj.detail[0].categoryId);
-                fd.append('AccountType', obj.detail[0].accountType);
-                $http({
-                    method: obj.method,
-                    url: $scope.apiLocation + '/user',
-                    data: $scope.clear(fd),
-                    headers: {
-                        'Content-Type': undefined,
-                        'Authorization': 'Bearer ' + token
-                    }
-                }).then(function successCallback(response) {
-
-                    if (response.status == 200) {
-                        //$scope.fnData.set('token', response.data.item.token);
-                        location.href = '/';
-                    } else {
-                        $scope.alert.action(response);
-
-                    }
-
-                    $scope.alert.action(response);
-                    obj.isLoading = false;
-
-                }, function errorCallback(response) {
-                    $scope.alert.action(response);
-                    obj.isLoading = false;
-                });
-
-            },
-            employeeAdd: function () {
-
-                obj.method = 'POST';
-                obj.employee = [];
-                obj.employee.push({});
-                $('#employeeAddFormModal').modal('show');
-
-
-            },
-            employeeSave: function () {
-                if (!obj.isLoading) {
-                    obj.isLoading = true;
-                }
-                var token = $scope.fnData.get('token');
-
-                var fd = new FormData();
-                fd.append('FirstName', obj.employee[0].firstName);
-                fd.append('LastName', obj.employee[0].lastName);
-                fd.append('UserName', $scope.urlFormat.urlText(obj.employee[0].userName));
-                fd.append('Email', obj.employee[0].email);
-                fd.append('Password', obj.employee[0].password);
-                $http({
-                    method: obj.method,
-                    url: $scope.apiLocation + '/user/employeeAdd',
-                    data: $scope.clear(fd),
-                    headers: {
-                        'Content-Type': undefined,
-                        'Authorization': 'Bearer ' + token
-                    }
-                }).then(function successCallback(response) {
-
-                    if (response.status == 200) {
-                        $('#employeeAddFormModal').modal('hide');
-                        $scope.alert.action(response);
-                        obj.myEmployees();
-                    } else {
-                        $scope.alert.action(response);
-
-                    }
-
-                    $scope.alert.action(response);
-                    obj.isLoading = false;
-
-                }, function errorCallback(response) {
-                    $scope.alert.action(response);
-                    obj.isLoading = false;
-                });
-
-            },
-            employeeUpdate: function () {
-                if (!obj.isLoading) {
-                    obj.isLoading = true;
-                }
-                var token = $scope.fnData.get('token');
-
-                var fd = new FormData();
-                fd.append('Id', obj.employee[0].id);
-
-                fd.append('FirstName', obj.employee[0].firstName);
-                fd.append('LastName', obj.employee[0].lastName);
-                fd.append('UserName', $scope.urlFormat.urlText(obj.employee[0].userName));
-                fd.append('Email', obj.employee[0].email);
-                $http({
-                    method: 'PUT',
-                    url: $scope.apiLocation + '/user',
-                    data: $scope.clear(fd),
-                    headers: {
-                        'Content-Type': undefined,
-                        'Authorization': 'Bearer ' + token
-                    }
-                }).then(function successCallback(response) {
-
-                    if (response.status == 200) {
-                        $('#employeeAddFormModal').modal('hide');
-                        $scope.alert.action(response);
-                        obj.myEmployees();
-                    } else {
-                        $scope.alert.action(response);
-
-                    }
-
-                    $scope.alert.action(response);
-                    obj.isLoading = false;
-
-                }, function errorCallback(response) {
-                    $scope.alert.action(response);
-                    obj.isLoading = false;
-                });
-
-            },
-
-            profileEditSave: function () {
-
-                var file = $scope.myFile;
-                obj.isLoading = true;
-                var token = $scope.fnData.get('token');
                 var fd = new FormData();
 
                 fd.append('Id', obj.detail[0].id);
-                fd.append('FirstName', obj.detail[0].firstName);
-                fd.append('UserName', obj.detail[0].userName);
-                fd.append('LastName', obj.detail[0].lastName);
-                fd.append('Email', obj.detail[0].email);
-                //fd.append('Password', obj.detail[0].password);
-                fd.append('OrganizationName', obj.detail[0].organizationName);
-                fd.append('OrganizationUrl', $scope.urlFormat.urlText(obj.detail[0].organizationName));
+                fd.append('Name', obj.detail[0].name);
+                //fd.append('IsCanBuy', obj.detail[0].isCanBuy);
 
 
-                //var myFile = document.getElementById('profilePhotoInput');
-                //if (myFile != null) {
-                //    fd.append('ProfilePhoto', myFile.files[0]);
-                //}
-                //var myFile = document.getElementById('profileBannerPhotoUpload');
-                //if (myFile != null) {
-                //    fd.append('ProfileBannerPhoto', myFile.files[0]);
-                //}
 
                 $http({
-                    method: 'PUT',
-                    url: $scope.apiLocation + '/user/userProfileEdit',
+                    method: obj.method,
+                    url: $scope.apiLocation + '/department',
                     data: $scope.clear(fd),
                     headers: {
                         'Content-Type': undefined,
                         'Authorization': 'Bearer ' + token
                     }
                 }).then(function successCallback(response) {
-
                     if (response.status == 200) {
-                        //$scope.fnData.set('token', response.data.item.token);
-                        //location.href = '/Dashboard';
-                        //location.href = '/Dashboard';
+                        $('#departmentAddFormModal').modal('hide');
                         $scope.alert.action(response);
-                        $('#userProfileEditFormModal').modal('hide');
+                        obj.multipleGet();
 
                     } else {
                         $scope.alert.action(response);
-
                     }
-                    $scope.alert.action(response);
                     obj.isLoading = false;
-
                 }, function errorCallback(response) {
                     $scope.alert.action(response);
                     obj.isLoading = false;
@@ -579,25 +380,30 @@ app.controller('controller', function ($scope, $http, $location) {
 
             },
             multipleGet: function () {
-
                 obj.isLoading = true;
-
                 var token = $scope.fnData.get('token');
-                var fd = new FormData();
 
+                //var fd = new FormData();
+
+                //fd.append('Search', obj.filter.search)
 
 
                 $http({
-                    method: 'POST',
-                    url: $scope.apiLocation + '/user/multipleget',
-                    data: $scope.clear(fd),
+                    method: 'GET',
+                    url: "/Bank/Index",
+                    //data: fd,
                     headers: {
-                        'Content-Type': undefined,
-                        'Authorization': 'Bearer ' + token
+                        //'Content-Type': 'application/json',
+
+                        'Authorization': token
                     }
                 }).then(function successCallback(response) {
                     if (response.status == 200) {
-                        obj.list = response.data.item;
+                        obj.list = [];
+                        angular.forEach(response.data.item, function (value, key) {
+                            obj.list.push(value);
+                        });
+                        obj.count = response.data.count;
                     } else {
                         $scope.alert.action(response);
                     }
@@ -607,57 +413,47 @@ app.controller('controller', function ($scope, $http, $location) {
                     obj.isLoading = false;
                 });
             },
-
-            myEmployees: function () {
-
-                obj.isLoading = true;
-
+            singleGet: function (id) {
                 var token = $scope.fnData.get('token');
-                var fd = new FormData();
-
                 $http({
-                    method: 'POST',
-                    url: $scope.apiLocation + '/user/myemployees',
-                    data: $scope.clear(fd),
+                    method: 'GET',
+                    url: $scope.apiLocation + '/department/' + id,
                     headers: {
                         'Content-Type': undefined,
                         'Authorization': 'Bearer ' + token
                     }
                 }).then(function successCallback(response) {
                     if (response.status == 200) {
-                        obj.employeeList = [];
-                        angular.forEach(response.data.item, function (value, key) {
-                            obj.employeeList.push(value);
-                        });
-                        obj.count = response.data.count;
-                    }
-                    else {
-                        $scope.alert.action(response);
-                    }
-                    obj.isLoading = false;
-                }, function errorCallback(response) {
-                    $scope.alert.action(response);
-                    obj.isLoading = false;
-                });
-            },
+                        obj.method = 'PUT';
+                        obj.detail = [];
+                        obj.detail.push(response.data.item);
+                        console.log(response.data.item);
+                        $('#departmentAddFormModal').modal('show');
+                    } else {
 
+                    }
+
+                }, function errorCallback(response) {
+                });
+
+            },
             delete: function (id) {
                 var token = $scope.fnData.get('token');
 
                 if (confirm('Silmek istediğine emin misin?')) {
                     $http({
                         method: 'DELETE',
-                        url: $scope.apiLocation + '/user/' + id,
+                        url: $scope.apiLocation + '/department/' + id,
 
                         headers: {
-                            'Content-Type': undefined,
+                            'Content-Type': 'application/json',
                             'Authorization': 'Bearer ' + token
                         }
                     }).then(function successCallback(response) {
 
                         if (response.status == 200) {
                             $scope.alert.action(response);
-                            obj.myEmployees();
+                            obj.multipleGet();
                         } else {
 
                         }
@@ -672,18 +468,10 @@ app.controller('controller', function ($scope, $http, $location) {
 
                 }
             },
-           
-            logOut: function () {
-                obj.isLoading = true;
-                $scope.fnData.set('token', '');
-                location.href = '/';
-            },
-
         };
         return obj;
     };
-    $scope.user = $scope.fnUser();
-
+    $scope.bank = $scope.fnBank();
 
 
 
@@ -771,7 +559,7 @@ app.controller('controller', function ($scope, $http, $location) {
         }
     };
 
-    $scope.user.currentUserGet();
+    //$scope.user.currentUserGet();
 
 
 });
