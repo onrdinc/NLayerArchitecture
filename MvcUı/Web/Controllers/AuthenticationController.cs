@@ -24,26 +24,20 @@ namespace Web.Controllers
         public async Task<IActionResult> LogIn(LogInDto dto)
         {
 
-            var postObj = new
-            {
-                Email = dto.Email,
-                Password = dto.Password,
-            };
-
             var response =
-              await _httpApiService.PostData<ResponseBody<UserItem>>("/user/token", JsonSerializer.Serialize(postObj));
+              await _httpApiService.PostData<ResponseBody<UserItem>>("/user/token", JsonSerializer.Serialize(dto));
 
 
 
             if (response.StatusCode == 200)
             {
 
-                return Json(new { IsSuccess = true,response.Item ,Messages = "Kullanıcı Bulundu" });
+                return Json(new { response.Item, StatusTexts = response.StatusTexts });
             }
             else
             {
                 //Anonim Nesne
-                return Json(new { IsSuccess = false, Messages = response.StatusTexts });
+                return Json(new { IsSuccess = false, StatusTexts = response.StatusTexts });
             }
         }
 

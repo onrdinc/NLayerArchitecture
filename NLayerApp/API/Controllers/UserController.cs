@@ -30,7 +30,7 @@ namespace API.Controllers
         [HttpPost]
         [Route("Token")]
         [AllowAnonymous]
-        public async Task<IActionResult> Token([FromBody] UserDto.LoginForm form)
+        public async Task<IActionResult> Token([FromForm] UserDto.LoginForm form)
         {
             var currentUserId = CurrentUser.Get(HttpContext);
             var mr = _userBs.Login(form, currentUserId.GetValueOrDefault()).Result;

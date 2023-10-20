@@ -82,7 +82,7 @@ app.filter('groupBy', function () {
 
 app.controller('controller', function ($scope, $http, $location) {
 
-    //$scope.apiLocation = 'https://localhost:7060/api';
+    $scope.apiLocation = 'https://localhost:7016/api';
 
 
 
@@ -197,7 +197,6 @@ app.controller('controller', function ($scope, $http, $location) {
             employee: [],
             employeeList: [],
             current: null,
-
             token: function () {
                 if (!obj.isLoading) {
                     obj.isLoading = true;
@@ -208,17 +207,16 @@ app.controller('controller', function ($scope, $http, $location) {
 
                 $http({
                     method: 'POST',
-                    url: "/Authentication/LogIn",
+                    url: $scope.apiLocation + '/user/token',
                     data: $scope.clear(fd),
-                    dataType:"json",
                     headers: {
-                        'Content-Type': undefined,
+                        'Content-Type': undefined, 
 
                     }
                 }).then(function successCallback(response) {
                     if (response.status == 200) {
                         $scope.fnData.set('token', response.data.item.token);
-                        //obj.myProfile();
+                        obj.myProfile();
                         //$location.path('/dashboard')
 
                         //location.href = '/#!/home';
@@ -230,8 +228,77 @@ app.controller('controller', function ($scope, $http, $location) {
                     $scope.alert.action(response);
                     obj.isLoading = false;
                 });
-
             },
+
+            //frombody
+            //token: function () {
+            //    if (!obj.isLoading) {
+            //        obj.isLoading = true;
+            //    }
+
+            //    var requestData = {
+            //        Email: obj.detail[0].email,
+            //        Password: obj.detail[0].password
+            //    };
+
+            //    $http({
+            //        method: 'POST',
+            //        url: $scope.apiLocation + '/user/token',
+            //        data: requestData, // Send the data as a JSON object
+            //        headers: {
+            //            'Content-Type': 'application/json', // Set the content type to JSON
+            //        }
+            //    }).then(function successCallback(response) {
+            //        if (response.status == 200) {
+            //            $scope.fnData.set('token', response.data.item.token);
+            //            obj.myProfile();
+            //            //$location.path('/dashboard')
+            //            //location.href = '/#!/home';
+            //        } else {
+            //            $scope.alert.action(response);
+            //        }
+            //        obj.isLoading = false;
+            //    }, function errorCallback(response) {
+            //        $scope.alert.action(response);
+            //        obj.isLoading = false;
+            //    });
+            //},
+
+            //token: function () {
+            //    if (!obj.isLoading) {
+            //        obj.isLoading = true;
+            //    }
+            //    var fd = new FormData();
+            //    fd.append('Email', obj.detail[0].email);
+            //    fd.append('Password', obj.detail[0].password);
+
+            //    $http({
+            //        method: 'POST',
+            //        url: "/Authentication/LogIn",
+            //        data: $scope.clear(fd),
+            //        dataType:"json",
+            //        headers: {
+            //            'Content-Type': undefined,
+
+            //        }
+            //    }).then(function successCallback(response) {
+            //        if (response.status == 200) {
+            //            console.log(response,'response');
+            //            $scope.fnData.set('token', response.data.item.token);
+            //            //obj.myProfile();
+            //            //$location.path('/dashboard')
+
+            //            //location.href = '/#!/home';
+            //        } else {
+            //            $scope.alert.action(response);
+            //        }
+            //        obj.isLoading = false;
+            //    }, function errorCallback(response) {
+            //        $scope.alert.action(response);
+            //        obj.isLoading = false;
+            //    });
+
+            //},
             currentUserGet: function () {
                 obj.isLoading = true;
                 var token = $scope.fnData.get('token');
