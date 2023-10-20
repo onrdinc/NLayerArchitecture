@@ -42,7 +42,7 @@ namespace Business.Implementations
                 
 
                 var user = _mapper.Map<Users>(form);
-                user.CreatedBy = currentUserId;
+                //user.CreatedBy = currentUserId;
                 user.Password = form.Password.ConvertToMD5();
                 var insert = await _repo.AddAsync(user);
                 await _unitOfWork.CommitAsync();

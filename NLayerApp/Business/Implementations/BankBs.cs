@@ -2,6 +2,7 @@
 using Business.Interfaces;
 using DataAccess.Interfaces;
 using Infrastructure.Aspects.Caching;
+using Infrastructure.Aspects.Performance;
 using Infrastructure.CrossCuttingConcerns.Caching;
 using Infrastructure.UnitOfWorks.Interface;
 using Infrastructure.Utilites.ApiResponses;
@@ -27,7 +28,7 @@ namespace Business.Implementations
             _unitOfWork = unitOfWork;
         }
 
-        [CacheRemoveAspect("IBankBs.MultipleGet")]
+        //[CacheRemoveAspect("IBankBs.MultipleGet")]
         public async Task<ApiResponse<BankDto.Response>> Add(BankDto.Form form, int currentUserId)
         {
             try
@@ -75,9 +76,10 @@ namespace Business.Implementations
             throw new NotImplementedException();
         }
 
-        
 
-        [CacheAspect]
+
+        //[CacheAspect]
+        [PerformanceAspect]
         public async Task<ApiResponse<List<BankDto.Response>>> MultipleGet(BankDto.FilterForm form, int currentUserId, params string[] includeList)
         {
             try
@@ -87,8 +89,8 @@ namespace Business.Implementations
 
 
 
-                //var gr = _repo.GetAllAsync(k => k.IsDeleted == false);
-                var gr = await _repo.GetBanks();
+                var gr = _repo.GetAllAsync(k => k.IsDeleted == false);
+                //var gr = await _repo.GetBanks();
                 var returnList = _mapper.Map<List<BankDto.Response>>(gr);
 
 
