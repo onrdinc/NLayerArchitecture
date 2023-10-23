@@ -1,4 +1,11 @@
-﻿<div class="container" ng-init="bank.multipleGet();">
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Layout dosyanızın yolunu belirtin
+}
+
+@await Html.PartialAsync("_bankModalPartial")
+
+<div class="container" ng-init="bank.multipleGet();">
+    <button class="btn btn-sm btn-success" ng-click="bank.add();">Ekle</button>
     <div class="card-body py-3">
         <div class="table-responsive">
             <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
@@ -7,7 +14,7 @@
                         <th>#</th>
                         <th>İsim</th>
                         <th></th>
-            
+
                     </tr>
                 </thead>
                 <tbody>

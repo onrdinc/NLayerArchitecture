@@ -57,7 +57,7 @@ app.filter('groupBy', function () {
 //            templateUrl: "/templates/companyDetail.html",
 //            title: 'Şirket Detayı'
 //        })
-      
+
 //        .otherwise({
 //            redirectTo: "/",
 //            title: 'Purchasing'
@@ -132,7 +132,7 @@ app.controller('controller', function ($scope, $http, $location) {
     };
 
 
-   
+
     $scope.getDateDiffText = function (d) {
         var currentDate = new Date();
         var maxUpdateDate = new Date(d);
@@ -201,7 +201,7 @@ app.controller('controller', function ($scope, $http, $location) {
 
                 obj.method = 'POST';
                 obj.detail = [];
-                obj.detail.push({ password: '', email: '', firstName: '', userName: '', lastName: ''});
+                obj.detail.push({ password: '', email: '', firstName: '', userName: '', lastName: '' });
 
 
             },
@@ -218,7 +218,7 @@ app.controller('controller', function ($scope, $http, $location) {
                     url: $scope.apiLocation + '/user/token',
                     data: $scope.clear(fd),
                     headers: {
-                        'Content-Type': undefined, 
+                        'Content-Type': undefined,
 
                     }
                 }).then(function successCallback(response) {
@@ -284,7 +284,6 @@ app.controller('controller', function ($scope, $http, $location) {
             //        method: 'POST',
             //        url: "/Authentication/LogIn",
             //        data: $scope.clear(fd),
-            //        dataType:"json",
             //        headers: {
             //            'Content-Type': undefined,
 
@@ -314,7 +313,7 @@ app.controller('controller', function ($scope, $http, $location) {
 
 
 
-           
+
             logOut: function () {
                 obj.isLoading = true;
                 $scope.fnData.set('token', '');
@@ -339,8 +338,9 @@ app.controller('controller', function ($scope, $http, $location) {
             count: 0,
             add: function () {
                 obj.method = 'POST';
-                obj.detail = [{}];
-                $('#departmentAddFormModal').modal('show');
+                obj.detail = [];
+                obj.detail.push({id:'', name: '' });
+                $('#bankFormModal').modal('show');
             },
             save: function () {
                 if (!obj.isLoading) {
@@ -351,24 +351,20 @@ app.controller('controller', function ($scope, $http, $location) {
 
                 fd.append('Id', obj.detail[0].id);
                 fd.append('Name', obj.detail[0].name);
-                //fd.append('IsCanBuy', obj.detail[0].isCanBuy);
-
-
-
+                console.log(fd,'fd');
                 $http({
                     method: obj.method,
-                    url: $scope.apiLocation + '/department',
-                    data: $scope.clear(fd),
+                    url: "/Bank/Save",
+                    data: 'dasdas',
                     headers: {
-                        'Content-Type': undefined,
-                        'Authorization': 'Bearer ' + token
+                        'Content-Type': 'application/json',
+                        'Authorization': token
                     }
                 }).then(function successCallback(response) {
                     if (response.status == 200) {
-                        $('#departmentAddFormModal').modal('hide');
+                        $('#bankFormModal').modal('hide');
                         $scope.alert.action(response);
                         obj.multipleGet();
-
                     } else {
                         $scope.alert.action(response);
                     }
@@ -377,8 +373,45 @@ app.controller('controller', function ($scope, $http, $location) {
                     $scope.alert.action(response);
                     obj.isLoading = false;
                 });
-
             },
+            //save: function () {
+            //    if (!obj.isLoading) {
+            //        obj.isLoading = true;
+            //    }
+            //    var token = $scope.fnData.get('token');
+            //    var fd = new FormData();
+
+            //    fd.append('Id', obj.detail[0].id);
+            //    fd.append('Name', obj.detail[0].name);
+
+
+
+
+            //    $http({
+            //        method: obj.method,
+            //        url: $scope.apiLocation + '/bank',
+            //        data: $scope.clear(fd),
+            //        headers: {
+            //            'Content-Type': undefined,
+            //            'Authorization': 'Bearer ' + token
+            //        }
+            //    }).then(function successCallback(response) {
+            //        if (response.status == 200) {
+            //            $('#bankFormModal').modal('hide');
+            //            $scope.alert.action(response);
+            //            obj.multipleGet();
+
+            //        } else {
+            //            $scope.alert.action(response);
+            //        }
+            //        obj.isLoading = false;
+            //    }, function errorCallback(response) {
+            //        $scope.alert.action(response);
+            //        obj.isLoading = false;
+            //    });
+
+            //},
+
             multipleGet: function () {
                 obj.isLoading = true;
                 var token = $scope.fnData.get('token');
@@ -422,10 +455,10 @@ app.controller('controller', function ($scope, $http, $location) {
                 var token = $scope.fnData.get('token');
                 $http({
                     method: 'GET',
-                    url: $scope.apiLocation + '/department/' + id,
+                    url: $scope.apiLocation + '/bank/' + id,
                     headers: {
                         'Content-Type': undefined,
-                        'Authorization': 'Bearer ' + token
+                        'Authorization': token
                     }
                 }).then(function successCallback(response) {
                     if (response.status == 200) {

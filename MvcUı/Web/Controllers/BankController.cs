@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using System.Xml.Linq;
 using Web.HttpApiServices;
 using Web.Models;
 using Web.Models.Dtos;
@@ -41,6 +40,26 @@ namespace Web.Controllers
                 return Json(new { IsSuccess = true, Message = response.StatusTexts });
 
             return Json(new { IsSuccess = false, Message = response.StatusTexts });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Save(BankDto.Form form)
+        {
+            var token = Request.Headers.Authorization.FirstOrDefault();
+
+
+            var response = await _httpApiService.PostData<ResponseBody<BankDto.Response>>("/bank", JsonSerializer.Serialize(form), token);
+
+            //ya da response.statuscode == 201
+            if (response.Status.ToString().StartsWith("2"))
+            {
+                return Json(new { IsSuccess = true, Message = response.StatusTexts, response.Item });
+
+            }
+            else
+            {
+                return Json(new { IsSuccess = false, Message = response.StatusTexts });
+            }
         }
 
     }

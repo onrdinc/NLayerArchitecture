@@ -1,0 +1,26 @@
+﻿﻿<div class="modal fade" id="bankFormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" ng-if="bank.method == 'POST'">Banka Ekle</h5>
+                <h5 class="modal-title" ng-if="bank.method == 'PUT'">Banka Güncelle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+            </div>
+            <div class="modal-body">
+                <form ng-repeat="d in bank.detail">
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Adı *</label>
+                        <input type="text" class="form-control" id="recipient-name" ng-model="d.name">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Vazgeç</button>
+                <button type="button" class="btn btn-primary" ng-click="bank.save();" ng-disabled="bank.isLoading">
+                    <i ng-if="bank.isLoading" class="fa-solid fa-spinner fa-spin-pulse"></i> Kaydet
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
