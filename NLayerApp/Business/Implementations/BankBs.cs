@@ -65,10 +65,42 @@ namespace Business.Implementations
             }
         }
 
-        [CacheRemoveAspect("IBankBs.MultipleGet")]
-        public Task<ApiResponse<NoData>> Delete(int id, int currentUserId)
+        [PerformanceAspect]
+
+        public async Task<ApiResponse<NoData>> Delete(int id, int currentUserId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                ApiResponse<NoData> rb = new ApiResponse<NoData>();
+                //var currentUser = await _.GetCurrentUserAsync(currentUserId);
+                //if (currentUser == null)
+                //{
+                //    rb.StatusCode = 400;
+                //    rb.StatusTexts.Add("Bu işlemi yapmaya yetkiniz yok!");
+                //    return await Task.FromResult(rb);
+                //}
+                var category = await _repo.GetByIdAsync(id);
+                if (category == null)
+                {
+                    rb.Status = 400;
+                    rb.StatusTexts.Add("Kayıt Bulunamadı");
+                    return await Task.FromResult(rb);
+                }
+
+                category.DeletedBy = currentUserId;
+                _repo.SoftDelete(category);
+                await _unitOfWork.CommitAsync();
+                rb.Status = 200;
+                rb.StatusTexts.Add("Kayıt başarıyla silindi");
+                return await Task.FromResult(rb);
+                //return ApiResponse<NoData>.Success(StatusCodes.Status200OK);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw await Task.FromResult(ex);
+            }
         }
 
         public Task<ApiResponse<NoData>> Delete(BankDto.FilterForm form, int currentUserId)

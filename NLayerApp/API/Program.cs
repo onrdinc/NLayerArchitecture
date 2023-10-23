@@ -65,9 +65,9 @@ Log.Logger = new LoggerConfiguration()
 
 //.MinimumLevel.Error()
 builder.Host.UseSerilog();
-builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-builder.Host.ConfigureContainer<ContainerBuilder>
-    (containerBuilder => containerBuilder.RegisterModule(new AutofacBusinessModule()));
+//builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+//builder.Host.ConfigureContainer<ContainerBuilder>
+//    (containerBuilder => containerBuilder.RegisterModule(new AutofacBusinessModule()));
 
 
 
@@ -113,10 +113,10 @@ builder.Services.AddControllers().
 
 
 
-builder.Services.AddDependencyResolvers(new ICoreModule[]
-{
-                new CoreModule(),
-});
+//builder.Services.AddDependencyResolvers(new ICoreModule[]
+//{
+//                new CoreModule(),
+//});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

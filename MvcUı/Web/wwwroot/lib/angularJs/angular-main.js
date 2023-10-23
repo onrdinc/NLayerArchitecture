@@ -448,11 +448,11 @@ app.controller('controller', function ($scope, $http, $location) {
                 if (confirm('Silmek istediğine emin misin?')) {
                     $http({
                         method: 'DELETE',
-                        url: $scope.apiLocation + '/department/' + id,
+                        url: $scope.apiLocation + '/bank/' + id,
 
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token
+                            'Authorization': token
                         }
                     }).then(function successCallback(response) {
 
