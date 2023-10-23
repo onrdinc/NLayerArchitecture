@@ -27,7 +27,7 @@ namespace Web.Controllers
             var response = await _httpApiService.PostData<ResponseBody<List<BankDto.Response>>>("/Bank/MultipleGet", JsonSerializer.Serialize(form), token: token);
 
             // JSON veri olarak dönüş yap
-            return Ok(response.Item);
+            return Json(response);
         }
 
     }

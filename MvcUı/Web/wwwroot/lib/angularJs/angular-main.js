@@ -405,7 +405,7 @@ app.controller('controller', function ($scope, $http, $location) {
                     if (response.status == 200) {
                         obj.list = [];
                         //obj.list = response.data;
-                        angular.forEach(response.data, function (value, key) {
+                        angular.forEach(response.data.item, function (value, key) {
                             obj.list.push(value);
                         });
                         obj.count = response.data.count;
