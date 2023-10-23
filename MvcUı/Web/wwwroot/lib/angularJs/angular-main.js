@@ -383,17 +383,17 @@ app.controller('controller', function ($scope, $http, $location) {
                 obj.isLoading = true;
                 var token = $scope.fnData.get('token');
 
-                //var fd = new FormData();
+                var fd = new FormData();
 
-                //fd.append('Search', obj.filter.search)
+                fd.append('Search', obj.filter.search)
 
 
                 $http({
-                    method: 'GET',
+                    method: 'POST',
                     url: "/Bank/Index",
-                    //data: fd,
+                    data: $scope.clear(fd),
                     headers: {
-                        //'Content-Type': 'application/json',
+                        'Content-Type': 'application/json',
 
                         'Authorization': token
                     }

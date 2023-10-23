@@ -55,8 +55,8 @@ namespace Web.HttpApiServices
             return response;
         }
 
-            public async Task<T> PostData<T>(string endPoint, string jsonData, string token = null)
-            {
+        public async Task<T> PostData<T>(string endPoint, string jsonData, string token = null)
+        {
             var client = _httpClientFactory.CreateClient();
             var requestMessage = new HttpRequestMessage()
             {
@@ -77,9 +77,9 @@ namespace Web.HttpApiServices
             return response;
         }
 
-            public Task<T> PutData<T>(string endPoint, string jsonData)
-            {
-                throw new NotImplementedException();
-            }
+        public Task<T> PutData<T>(string endPoint, string jsonData)
+        {
+            throw new NotImplementedException();
         }
     }
+}
