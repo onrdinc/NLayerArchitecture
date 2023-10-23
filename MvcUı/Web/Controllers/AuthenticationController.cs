@@ -29,7 +29,7 @@ namespace Web.Controllers
 
 
 
-            if (response.StatusCode == 200)
+            if (response.Status == 200)
             {
 
                 return Json(new { response.Item, StatusTexts = response.StatusTexts });

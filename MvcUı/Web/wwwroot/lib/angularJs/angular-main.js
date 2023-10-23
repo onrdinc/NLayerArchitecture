@@ -390,7 +390,7 @@ app.controller('controller', function ($scope, $http, $location) {
 
                 $http({
                     method: 'POST',
-                    url: "/Bank/Index",
+                    url: "/Bank/GetBankData",
                     data: $scope.clear(fd),
                     headers: {
                         'Content-Type': 'application/json',
@@ -398,9 +398,14 @@ app.controller('controller', function ($scope, $http, $location) {
                         'Authorization': token
                     }
                 }).then(function successCallback(response) {
+                    console.log('response', response);
+                    console.log('response.data', response.data);
+                    console.log('response.data.item', response.data.item);
+
                     if (response.status == 200) {
                         obj.list = [];
-                        angular.forEach(response.data.item, function (value, key) {
+                        //obj.list = response.data;
+                        angular.forEach(response.data, function (value, key) {
                             obj.list.push(value);
                         });
                         obj.count = response.data.count;

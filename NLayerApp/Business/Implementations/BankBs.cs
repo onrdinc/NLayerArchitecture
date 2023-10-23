@@ -39,7 +39,7 @@ namespace Business.Implementations
 
                 if (string.IsNullOrEmpty(form.Name))
                 {
-                    rb.StatusCode = 400;
+                    rb.Status = 400;
                     rb.StatusTexts.Add("Kategori adı boş geçilemez.");
                     return await Task.FromResult(rb);
                 }
@@ -53,7 +53,7 @@ namespace Business.Implementations
 
                 //rb = SingleGet(c.Id, currentUserId).Result;
 
-                rb.StatusCode = 200;
+                rb.Status = 200;
                 rb.StatusTexts.Add("Kaydedildi.");
                 return await Task.FromResult(rb);
                 //return ApiResponse<MRoleGroupTypeDto.Response>.Success(StatusCodes.Status201Created, c);

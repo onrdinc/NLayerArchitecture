@@ -22,7 +22,7 @@ namespace API.Controllers
         public async Task<IActionResult> Post([FromForm] BankDto.Form form)
         {
             var response = await _bankBs.Add(form,0);
-            return await Task.FromResult(StatusCode(response.StatusCode, response));
+            return await Task.FromResult(StatusCode(response.Status, response));
 
         }
 
@@ -31,7 +31,7 @@ namespace API.Controllers
         public async Task<IActionResult> MultipleGet([FromBody] BankDto.FilterForm form)
         {
             var response = await _bankBs.MultipleGet(form, 0);
-            return await Task.FromResult(StatusCode(response.StatusCode, response));
+            return await Task.FromResult(StatusCode(response.Status, response));
 
         }
     }

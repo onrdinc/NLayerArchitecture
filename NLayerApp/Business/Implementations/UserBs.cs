@@ -48,7 +48,7 @@ namespace Business.Implementations
                 await _unitOfWork.CommitAsync();
                 var u = _mapper.Map<UserDto.Response>(insert);
 
-                rb.StatusCode = 200;
+                rb.Status = 200;
                 rb.StatusTexts.Add("Kaydedildi");
                 return await Task.FromResult(rb);
 
@@ -98,7 +98,7 @@ namespace Business.Implementations
                 var user = await _repo.GetByUserAsync(form.Email, form.Password.ConvertToMD5(), includeList);
                 if (user == null)
                 {
-                    mr.StatusCode = 400;
+                    mr.Status = 400;
                     mr.StatusTexts.Add("Email veya şifrenizi kontrol edin!");
                     return await Task.FromResult(mr);
 
@@ -107,7 +107,7 @@ namespace Business.Implementations
 
 
                 //var response = SingleGet(user.Id, user.Id, "Category").Result;
-                mr.StatusCode = 200;
+                mr.Status = 200;
                 mr.Item = response;
                 mr.StatusTexts.Add("Giriş Başarılı");
                 return await Task.FromResult(mr);

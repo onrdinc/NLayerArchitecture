@@ -15,12 +15,20 @@ namespace Web.Controllers
 
             _httpApiService = httpApiService;
         }
-        public async Task<IActionResult> Index(BankDto.FilterForm form)
+        public async Task<IActionResult> Index()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> GetBankData(BankDto.FilterForm form)
         {
             var token = Request.Headers.Authorization.FirstOrDefault();
 
-            var response = await _httpApiService.PostData<ResponseBody<List<BankDto.Response>>>("/Bank/MultipleGet", JsonSerializer.Serialize(form), token:token);
-            return View(response.Item);
+            var response = await _httpApiService.PostData<ResponseBody<List<BankDto.Response>>>("/Bank/MultipleGet", JsonSerializer.Serialize(form), token: token);
+
+            // JSON veri olarak dönüş yap
+            return Ok(response.Item);
         }
+
     }
 }

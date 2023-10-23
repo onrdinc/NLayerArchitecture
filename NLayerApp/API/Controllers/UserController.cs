@@ -34,7 +34,7 @@ namespace API.Controllers
         {
             var currentUserId = CurrentUser.Get(HttpContext);
             var mr = _userBs.Login(form, currentUserId.GetValueOrDefault()).Result;
-            if (mr.StatusCode == 200)
+            if (mr.Status == 200)
             {
                 var claims = new[]
                 {
@@ -55,7 +55,7 @@ namespace API.Controllers
                 string tokenstr = new JwtSecurityTokenHandler().WriteToken(token);
                 mr.Item.Token = tokenstr;
             }
-            return await Task.FromResult(StatusCode(mr.StatusCode, mr));
+            return await Task.FromResult(StatusCode(mr.Status, mr));
         }
 
         [HttpPost]
@@ -66,7 +66,7 @@ namespace API.Controllers
             var currentUserId = CurrentUser.Get(HttpContext);
             var response = await _userBs.Add(form, currentUserId.GetValueOrDefault());
             //return CreatedAtAction(nameof(SingleGet), new { id = response.Item.Id }, response);
-            return await Task.FromResult(StatusCode(response.StatusCode, response));
+            return await Task.FromResult(StatusCode(response.Status, response));
 
         }
     }

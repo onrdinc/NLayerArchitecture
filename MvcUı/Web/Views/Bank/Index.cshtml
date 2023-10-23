@@ -1,0 +1,32 @@
+﻿<div class="container" ng-init="bank.multipleGet();">
+    <div class="card-body py-3">
+        <div class="table-responsive">
+            <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                <thead>
+                    <tr class="fw-bold text-muted">
+                        <th>#</th>
+                        <th>İsim</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-top" ng-repeat="cl in bank.list">
+                        <td>{{$index + 1}}</td>
+                        <td>{{cl.name}}</td>
+                        <td>
+                            <div class="d-flex justify-content-end flex-shrink-0">
+                                <button ng-click="bank.singleGet(cl.id);" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button ng-click="bank.delete(cl.id);" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
